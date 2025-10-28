@@ -1,4 +1,4 @@
-package com.example.smartdelivery;
+package co.edu.umanizales.smartdelivery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

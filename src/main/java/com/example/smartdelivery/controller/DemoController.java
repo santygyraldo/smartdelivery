@@ -9,7 +9,7 @@ public class DemoController {
 
     @GetMapping("/")
     public String holaMundo() {
-        return "Hola mundo, esto es Smart Dalivery";
+        return "Hola mundo, esto es Smart Delivery";
     }
     
     @GetMapping("/api/saludo")
