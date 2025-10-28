@@ -2,23 +2,20 @@ package co.edu.umanizales.smartdelivery.model;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "clientes")
+@Table(name = "repartidores")
 @JsonIdentityInfo(
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "id"
 )
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Cliente {
+public class Repartidor {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +26,21 @@ public class Cliente {
     @Column(nullable = false, length = 100)
     private String nombre;
     
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "El formato del email no es válido")
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    @NotBlank(message = "La placa del vehículo es obligatoria")
+    @Column(nullable = false, length = 10, unique = true)
+    private String placaVehiculo;
     
     @NotBlank(message = "El teléfono es obligatorio")
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     @Column(nullable = false, length = 10)
     private String telefono;
-
-    // Constructor con parámetros (sin el id)
-    public Cliente(String nombre, String email, String telefono) {
+    
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean disponible = true;
+    
+    public Repartidor(String nombre, String placaVehiculo, String telefono) {
         this.nombre = nombre;
-        this.email = email;
+        this.placaVehiculo = placaVehiculo;
         this.telefono = telefono;
     }
 }

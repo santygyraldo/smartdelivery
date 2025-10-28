@@ -1,39 +1,225 @@
 {
 	"info": {
-		"_postman_id": "cd53ff36-1935-446e-9288-817316ff5bde",
-		"name": "Smart Delivery",
+		"_postman_id": "4944c5a3-318f-44fe-b58d-a5561048350f",
+		"name": "Smart Delivery API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "49300537",
-		"_collection_link": "https://sgiraldo115562-9163606.postman.co/workspace/sgiraldo115562's-Workspace~88a23c9f-d6c2-402d-84e0-22ea3deae19e/collection/49300537-cd53ff36-1935-446e-9288-817316ff5bde?action=share&source=collection_link&creator=49300537"
+		"_collection_link": "https://sgiraldo115562-9163606.postman.co/workspace/sgiraldo115562's-Workspace~88a23c9f-d6c2-402d-84e0-22ea3deae19e/collection/49300537-4944c5a3-318f-44fe-b58d-a5561048350f?action=share&source=collection_link&creator=49300537"
 	},
 	"item": [
 		{
-			"name": "Inicio de API",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
+			"name": "Bienvenida",
+			"item": [
+				{
+					"name": "Página de Inicio",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								""
+							]
+						},
+						"description": "Muestra el mensaje de bienvenida"
+					},
+					"response": []
+				},
+				{
+					"name": "Página de Saludo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/saludo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"saludo"
+							]
+						},
+						"description": "Muestra un saludo personalizado"
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"name": "Saludo",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/saludo",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"saludo"
-					]
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Listar todos los clientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "Obtiene todos los clientes registrados"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener cliente por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"1"
+							]
+						},
+						"description": "Obtiene un cliente por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear nuevo cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"juan.perez@ejemplo.com\",\n    \"telefono\": \"1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes"
+							]
+						},
+						"description": "Crea un nuevo cliente"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar cliente",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"nombre\": \"Juan Carlos Pérez\",\n    \"email\": \"juan.carlos@ejemplo.com\",\n    \"telefono\": \"0987654321\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"1"
+							]
+						},
+						"description": "Actualiza un cliente existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"1"
+							]
+						},
+						"description": "Elimina un cliente por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar cliente por email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/clientes/buscar-por-email?email=juan.perez@ejemplo.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clientes",
+								"buscar-por-email"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "juan.perez@ejemplo.com"
+								}
+							]
+						},
+						"description": "Busca un cliente por su dirección de correo electrónico"
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }
