@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "74a0224b-ee9c-48cf-a81a-446a8ba7e785",
+		"name": "Smart Delivery",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49300537",
+		"_collection_link": "https://sgiraldo115562-9163606.postman.co/workspace/sgiraldo115562's-Workspace~88a23c9f-d6c2-402d-84e0-22ea3deae19e/collection/49300537-74a0224b-ee9c-48cf-a81a-446a8ba7e785?action=share&source=collection_link&creator=49300537"
+	},
+	"item": [
+		{
+			"name": "clientes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\r\n  \"name\": \"María López\",\r\n  \"document\": \"87654121\",\r\n  \"phone\": \"3209874543\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/customers",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "clientes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/customers",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Repartidores",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Santiago Giraldo\",\r\n  \"document\": \"12345105386886867890\",\r\n  \"phone\": \"31139346313\",\r\n  \"email\": \"repartidor@example.com\",\r\n  \"vehiclePlate\": \"ABC123\",\r\n  \"available\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/api/deliverers",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"api",
+						"deliverers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "repartidores llamar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/deliverers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"deliverers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "crear paquete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Paquete de ejemplo\",\r\n    \"weight\": 1.5,\r\n    \"width\": 20.5,\r\n    \"height\": 30.0,\r\n    \"length\": 15.0,\r\n    \"observations\": \"Fragil, manejar con cuidado\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/packages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mostrar paquete",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/packages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "crear orden",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customerId\": 1,\r\n    \"deliveryAddress\": \"Carrera 9 #45-12, Manizales, Colombia\",\r\n    \"package_\": {\r\n        \"description\": \"Paquete frágil\",\r\n        \"weight\": 2.5,\r\n        \"width\": 30.0,\r\n        \"height\": 20.0,\r\n        \"length\": 15.0,\r\n        \"observations\": \"Manejar con cuidado\"\r\n    },\r\n    \"status\": \"PENDING\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mostrar ordenes",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
