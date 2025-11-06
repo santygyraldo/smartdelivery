@@ -11,11 +11,11 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class Customer implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Customer implements Serializable {  // permite que los objetos se serialicen
+    private static final long serialVersionUID = 1L; // identificador unico para la serializacion
 
-    @CsvBindByName(column = "ID", required = true)
-    private Long id;
+    @CsvBindByName(column = "ID", required = true) // mapea la columna ID del CSV
+    private Long id; // identificador del cliente
     
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
@@ -32,7 +32,7 @@ public class Customer implements Serializable {
     @CsvBindByName(column = "TELEFONO", required = true)
     private String phone;
 
-    public Customer(String name, String document, String phone) {
+    public Customer(String name, String document, String phone) { // constructor
         this.name = name;
         this.document = document;
         this.phone = phone;

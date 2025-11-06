@@ -1,10 +1,10 @@
 package co.edu.umanizales.smartdelivery.model;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank; // obligatorio
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-@Data
+@Data // genera getters, setters, toString, equals y hashCode
 public class DeliveryRoute {
 
     private Long id;
@@ -21,6 +21,7 @@ public class DeliveryRoute {
         // Constructor vacío
     }
 
+    // constructor con parámetros
     public DeliveryRoute(String origin, String destination) {
         this.origin = origin;
         this.destination = destination;

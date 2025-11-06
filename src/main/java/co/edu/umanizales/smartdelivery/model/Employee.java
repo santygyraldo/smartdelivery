@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class Employee {
+public abstract class Employee {  // Clase abstracta no se puede instanciar directamente
 
 
     private Long id;
@@ -26,7 +26,7 @@ public abstract class Employee {
     public Employee() {
         // Constructor vacío
     }
-
+// Constructor con parámetros
     public Employee(String name, String document) {
         this.name = name;
         this.document = document;

@@ -42,23 +42,24 @@ public class Order {
     private OrderStatus status = OrderStatus.PENDING;
     
 
-    @PastOrPresent
+    @PastOrPresent // La fecha de creación debe ser la actual o pasada
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
-    @CsvDate("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
-    @CsvBindByName(column = "CREATIONDATE")
+    @CsvDate("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS") // Formato de fecha para CSV
+    @CsvBindByName(column = "CREATIONDATE") // Nombre de la columna en el CSV
     private LocalDateTime creationDate = LocalDateTime.now();
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
     @CsvDate("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
     @CsvBindByName(column = "UPDATEDATE")
     private LocalDateTime updateDate;
-    
+
+    // Constructor con parámetros
     public Order(Customer customer, String deliveryAddress, Package package_) {
         this.customer = customer;
         this.deliveryAddress = deliveryAddress;
         this.package_ = package_;
     }
-    
+    // Actualiza el estado del pedido
     public void updateStatus(OrderStatus newStatus) {
         this.status = newStatus;
         this.updateDate = LocalDateTime.now();

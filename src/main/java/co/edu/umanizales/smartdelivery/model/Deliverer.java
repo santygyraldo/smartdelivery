@@ -1,15 +1,15 @@
 package co.edu.umanizales.smartdelivery.model;
 
 
-import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*; // importa las anotaciones de validacion
+import lombok.Data; // importa la anotacion Data de lombok
+import lombok.NoArgsConstructor; //
 import lombok.EqualsAndHashCode;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class Deliverer extends Employee {
+@Data // genera getters, setters, toString, equals y hashCode
+@NoArgsConstructor // genera constructor sin argumentos
+@EqualsAndHashCode(callSuper = true) // genera equals y hashCode considerando la superclase
+public class Deliverer extends Employee { // extendes hereda de Empleado
 
 
     @NotBlank(message = "La placa del vehículo es obligatoria")
@@ -20,8 +20,9 @@ public class Deliverer extends Employee {
     private String phone;
 
 
-    private boolean available = true;
+    private boolean available = true; // indica si el repartidor esta disponible
 
+    // constructor
     public Deliverer(String name, String document, String vehiclePlate, String phone) {
         super(name, document);
         this.vehiclePlate = vehiclePlate;

@@ -23,7 +23,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
-    @Autowired
+    @Autowired // Inyección de dependencia
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
