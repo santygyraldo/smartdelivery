@@ -224,6 +224,53 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "crear ruta",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"origin\": \"Bodega Central\",\r\n    \"destination\": \"Calle 23 #45-67\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/api/routes",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mostrar rutas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/api/routes",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"routes"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
