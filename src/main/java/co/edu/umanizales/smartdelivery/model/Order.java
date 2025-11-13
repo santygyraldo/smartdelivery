@@ -1,67 +1,40 @@
 package co.edu.umanizales.smartdelivery.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvCustomBindByName;
-import com.opencsv.bean.CsvDate;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)  // Incluye solo campos no nulos en el JSON
 public class Order {
     
-
+    @CsvBindByName(column = "ID")
     private Long id;
-    
 
     @NotNull(message = "El cliente es obligatorio")
-    @ToString.Exclude
-    private Customer customer;
-    
-
-    @NotNull(message = "La dirección de entrega es obligatoria")
-    private String deliveryAddress;
-    
+    @CsvBindByName(column = "CUSTOMER_ID")
+    @JsonProperty("customerId")  // Nombre del campo en el JSON
+    private Long customerId;
 
     @NotNull(message = "El paquete es obligatorio")
-    @ToString.Exclude
-    private Package package_;
-    
+    @CsvBindByName(column = "PACKAGE_ID")
+    @JsonProperty("packageId")  // Nombre del campo en el JSON
+    private Long packageId;
 
-    @ToString.Exclude
-    private Deliverer deliverer;
-    
+    @CsvBindByName(column = "DELIVERER_ID")
+    @JsonProperty("delivererId")  // Opcional, solo si se asigna un repartidor
+    private Long delivererId;
 
-    private OrderStatus status = OrderStatus.PENDING;
-    
 
-    @PastOrPresent // La fecha de creación debe ser la actual o pasada
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
-    @CsvDate("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS") // Formato de fecha para CSV
-    @CsvBindByName(column = "CREATIONDATE") // Nombre de la columna en el CSV
-    private LocalDateTime creationDate = LocalDateTime.now();
-    
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
-    @CsvDate("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
-    @CsvBindByName(column = "UPDATEDATE")
-    private LocalDateTime updateDate;
+    @NotNull(message = "La dirección de entrega es obligatoria")
+    @CsvBindByName(column = "DELIVERY_ADDRESS")
+    private String deliveryAddress;
 
-    // Constructor con parámetros
-    public Order(Customer customer, String deliveryAddress, Package package_) {
-        this.customer = customer;
-        this.deliveryAddress = deliveryAddress;
-        this.package_ = package_;
+
     }
-    // Actualiza el estado del pedido
-    public void updateStatus(OrderStatus newStatus) {
-        this.status = newStatus;
-        this.updateDate = LocalDateTime.now();
-    }
-}
+

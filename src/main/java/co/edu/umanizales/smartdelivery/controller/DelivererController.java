@@ -2,9 +2,8 @@ package co.edu.umanizales.smartdelivery.controller;
 
 import co.edu.umanizales.smartdelivery.model.Deliverer;
 import co.edu.umanizales.smartdelivery.service.DelivererService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,74 +14,44 @@ public class DelivererController {
 
     private final DelivererService delivererService;
 
-    @Autowired
     public DelivererController(DelivererService delivererService) {
         this.delivererService = delivererService;
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Deliverer create(@Valid @RequestBody Deliverer deliverer) {
+        return delivererService.create(deliverer);
+    }
+
     @GetMapping
-    public ResponseEntity<List<Deliverer>> listDeliverers() {
-        List<Deliverer> deliverers = delivererService.listDeliverers();
-        return ResponseEntity.ok(deliverers);
+    public List<Deliverer> findAll() {
+        return delivererService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDelivererById(@PathVariable Long id) {
-        try {
-            Deliverer deliverer = delivererService.findById(id);
-            return ResponseEntity.ok(deliverer);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createDeliverer(@RequestBody Deliverer deliverer) {
-        try {
-            Deliverer newDeliverer = delivererService.registerDeliverer(deliverer);
-            return new ResponseEntity<>(newDeliverer, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public Deliverer findById(@PathVariable Long id) {
+        return delivererService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDeliverer(
-            @PathVariable Long id,
-            @RequestBody Deliverer deliverer) {
-        try {
-            if (!id.equals(deliverer.getId())) {
-                return ResponseEntity.badRequest()
-                        .body("The deliverer ID does not match the URL ID");
-            }
-            Deliverer updatedDeliverer = delivererService.updateDeliverer(id, deliverer);
-            return ResponseEntity.ok(updatedDeliverer);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public Deliverer update(@PathVariable Long id, @Valid @RequestBody Deliverer deliverer) {
+        return delivererService.update(id, deliverer);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDeliverer(@PathVariable Long id) {
-        try {
-            delivererService.deleteDeliverer(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(e.getMessage());
-        }
+    @DeleteMapping("/{id}") // Elimina un entregador por su ID
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        delivererService.delete(id);
     }
 
-    @GetMapping("/available")
-    public ResponseEntity<List<Deliverer>> listAvailableDeliverers() {
-        List<Deliverer> deliverers = delivererService.listAvailableDeliverers(true);
-        return ResponseEntity.ok(deliverers);
+    @PutMapping("/{id}/availability") // Actualiza la disponibilidad de un entregador
+    public Deliverer setAvailability(@PathVariable Long id, @RequestParam boolean available) {
+        return delivererService.setAvailability(id, available);
     }
 
-    @GetMapping("/unavailable")
-    public ResponseEntity<List<Deliverer>> listUnavailableDeliverers() {
-        List<Deliverer> deliverers = delivererService.listAvailableDeliverers(false);
-        return ResponseEntity.ok(deliverers);
+    @GetMapping("/available/one")
+    public Deliverer findAvailable() {
+        return delivererService.findAvailable();
     }
 }

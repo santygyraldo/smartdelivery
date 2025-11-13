@@ -1,66 +1,91 @@
 package co.edu.umanizales.smartdelivery.service;
 
-import co.edu.umanizales.smartdelivery.exception.DelivererException;
 import co.edu.umanizales.smartdelivery.model.Deliverer;
-import co.edu.umanizales.smartdelivery.repository.DelivererRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class DelivererService {
 
-    @Autowired
-    private DelivererRepository delivererRepository;
+    private final List<Deliverer> deliverers = new ArrayList<>();
+    private final AtomicLong idSequence = new AtomicLong(1);
 
-    public List<Deliverer> listDeliverers() {
-        return delivererRepository.findAll();
-    }
-
-    public Deliverer findById(Long id) {
-        return delivererRepository.findById(id)
-                .orElseThrow(() -> new DelivererException("Deliverer not found with ID: " + id));
-    }
-
-    public Deliverer registerDeliverer(Deliverer deliverer) {
-        if (delivererRepository.existsByDocument(deliverer.getDocument())) {
-            throw new DelivererException("The document is already registered");
+    public Deliverer create(Deliverer deliverer) {
+        if (deliverer.getId() == null) {
+            deliverer.setId(idSequence.getAndIncrement());
         }
-        if (delivererRepository.existsByVehiclePlate(deliverer.getVehiclePlate())) {
-            throw new DelivererException("The vehicle plate is already in use");
+        if (existsByDocument(deliverer.getDocument())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El documento ya existe");
         }
-        delivererRepository.save(deliverer);
+        deliverers.add(deliverer);
         return deliverer;
     }
 
-    public Deliverer updateDeliverer(Long id, Deliverer updatedDeliverer) {
-        Deliverer existingDeliverer = findById(id);
-        
-        if (delivererRepository.existsByDocumentAndIdNot(updatedDeliverer.getDocument(), id)) {
-            throw new DelivererException("The document is already in use by another deliverer");
-        }
-        
-        if (delivererRepository.existsByVehiclePlateAndIdNot(updatedDeliverer.getVehiclePlate(), id)) {
-            throw new DelivererException("The vehicle plate is already in use by another deliverer");
-        }
-        
-        existingDeliverer.setName(updatedDeliverer.getName());
-        existingDeliverer.setDocument(updatedDeliverer.getDocument());
-        existingDeliverer.setVehiclePlate(updatedDeliverer.getVehiclePlate());
-        existingDeliverer.setPhone(updatedDeliverer.getPhone());
-        existingDeliverer.setAvailable(updatedDeliverer.isAvailable());
-        
-        delivererRepository.save(existingDeliverer);
-        return existingDeliverer;
+    public List<Deliverer> findAll() {
+        return deliverers;
     }
 
-    public void deleteDeliverer(Long id) {
-        Deliverer deliverer = findById(id);
-        delivererRepository.deleteById(id);
+    public Deliverer findById(Long id) {
+        for (Deliverer d : deliverers) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Repartidor no encontrado");
     }
 
-    public List<Deliverer> listAvailableDeliverers(boolean available) {
-        return delivererRepository.findByAvailable(available);
+    public Deliverer update(Long id, Deliverer update) {
+        for (Deliverer d : deliverers) {
+            if (d.getId().equals(id)) {
+                if (update.getName() != null) d.setName(update.getName());
+                if (update.getDocument() != null && !update.getDocument().equals(d.getDocument()) && existsByDocument(update.getDocument())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El documento ya existe");
+                }
+                if (update.getDocument() != null) d.setDocument(update.getDocument());
+                if (update.getPhone() != null) d.setPhone(update.getPhone());
+                if (update.getVehiclePlate() != null) d.setVehiclePlate(update.getVehiclePlate());
+                return d;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Repartidor no encontrado");
+    }
+
+    public void delete(Long id) {
+        for (int i = 0; i < deliverers.size(); i++) {
+            if (deliverers.get(i).getId().equals(id)) {
+                deliverers.remove(i);
+                return;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Repartidor no encontrado");
+    }
+
+    public Deliverer setAvailability(Long id, boolean available) {
+        Deliverer d = findById(id);
+        d.setAvailable(available);
+        return d;
+    }
+
+    public Deliverer findAvailable() {
+        for (Deliverer d : deliverers) {
+            if (d.isAvailable()) {
+                return d;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay repartidores disponibles");
+    }
+
+    private boolean existsByDocument(String document) {
+        for (Deliverer d : deliverers) {
+            if (d.getDocument().equals(document)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

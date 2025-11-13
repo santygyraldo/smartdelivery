@@ -2,10 +2,8 @@ package co.edu.umanizales.smartdelivery.controller;
 
 import co.edu.umanizales.smartdelivery.model.Vehicle;
 import co.edu.umanizales.smartdelivery.service.VehicleService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,41 +14,41 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    @Autowired
     public VehicleController(VehicleService vehicleService) {
         this.vehicleService = vehicleService;
     }
 
+    public static record PlateRequest(@NotBlank String plate) {}
+
     @PostMapping
-    public ResponseEntity<Vehicle> createVehicle(@Valid @RequestBody Vehicle vehicle) {
-        Vehicle newVehicle = vehicleService.saveVehicle(vehicle);
-        return new ResponseEntity<>(newVehicle, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Vehicle create(@RequestParam String type, @RequestBody PlateRequest request) {
+        return vehicleService.create(type, request.plate());
     }
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> listVehicles() {
-        return ResponseEntity.ok(vehicleService.listAll());
+    public List<Vehicle> findAll() {
+        return vehicleService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Vehicle> getVehicle(@PathVariable Long id) {
-        return ResponseEntity.ok(vehicleService.findById(id));
+    public Vehicle findById(@PathVariable Long id) {
+        return vehicleService.findById(id);
     }
 
     @GetMapping("/plate/{plate}")
-    public ResponseEntity<Vehicle> getVehicleByPlate(@PathVariable String plate) {
-        return ResponseEntity.ok(vehicleService.findByPlate(plate));
+    public Vehicle findByPlate(@PathVariable String plate) {
+        return vehicleService.findByPlate(plate);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long id, @Valid @RequestBody Vehicle vehicle) {
-        Vehicle updatedVehicle = vehicleService.updateVehicle(id, vehicle);
-        return ResponseEntity.ok(updatedVehicle);
+    public Vehicle update(@PathVariable Long id, @RequestBody PlateRequest request) {
+        return vehicleService.update(id, request.plate());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
-        vehicleService.deleteVehicle(id);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        vehicleService.delete(id);
     }
 }

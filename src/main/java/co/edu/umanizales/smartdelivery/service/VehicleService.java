@@ -1,59 +1,93 @@
 package co.edu.umanizales.smartdelivery.service;
 
+import co.edu.umanizales.smartdelivery.model.Motorcycle;
+import co.edu.umanizales.smartdelivery.model.Truck;
+import co.edu.umanizales.smartdelivery.model.Van;
 import co.edu.umanizales.smartdelivery.model.Vehicle;
-import co.edu.umanizales.smartdelivery.repository.VehicleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class VehicleService {
-    private final VehicleRepository vehicleRepository;
 
-    @Autowired
-    public VehicleService(VehicleRepository vehicleRepository) {
-        this.vehicleRepository = vehicleRepository;
-    }
+    private final List<Vehicle> vehicles = new ArrayList<>();
+    private final AtomicLong idSequence = new AtomicLong(1);
 
-    public Vehicle saveVehicle(Vehicle vehicle) {
-        if (vehicle.getPlate() == null || vehicle.getPlate().trim().isEmpty()) {
-            throw new IllegalArgumentException("La placa del vehículo es obligatoria");
+    public Vehicle create(String type, String plate) {
+        if (existsByPlate(plate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La placa ya existe");
         }
-        return vehicleRepository.save(vehicle);
+        Vehicle v;
+        if ("motorcycle".equalsIgnoreCase(type)) {
+            v = new Motorcycle(plate);
+        } else if ("van".equalsIgnoreCase(type)) {
+            v = new Van(plate);
+        } else if ("truck".equalsIgnoreCase(type)) {
+            v = new Truck(plate);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de vehículo inválido");
+        }
+        v.setId(idSequence.getAndIncrement());
+        vehicles.add(v);
+        return v;
     }
 
-    public List<Vehicle> listAll() {
-        return vehicleRepository.findAll();
+    public List<Vehicle> findAll() {
+        return vehicles;
     }
 
     public Vehicle findById(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo");
+        for (Vehicle v : vehicles) {
+            if (v.getId().equals(id)) {
+                return v;
+            }
         }
-        return vehicleRepository.findById(id);
-    }
-
-    public void deleteVehicle(Long id) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo");
-        }
-        vehicleRepository.delete(id);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehículo no encontrado");
     }
 
     public Vehicle findByPlate(String plate) {
-        if (plate == null || plate.trim().isEmpty()) {
-            throw new IllegalArgumentException("La placa es obligatoria");
+        for (Vehicle v : vehicles) {
+            if (v.getPlate().equalsIgnoreCase(plate)) {
+                return v;
+            }
         }
-        return vehicleRepository.findByPlate(plate);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehículo no encontrado");
     }
 
-    public Vehicle updateVehicle(Long id, Vehicle vehicleData) {
-        Vehicle vehicle = findById(id);
-        if (vehicleData.getPlate() != null && !vehicleData.getPlate().trim().isEmpty()) {
-            vehicle.setPlate(vehicleData.getPlate());
+    public Vehicle update(Long id, String newPlate) {
+        if (newPlate != null && existsByPlate(newPlate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La placa ya existe");
         }
-        return vehicleRepository.save(vehicle);
+        for (Vehicle v : vehicles) {
+            if (v.getId().equals(id)) {
+                if (newPlate != null) v.setPlate(newPlate);
+                return v;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehículo no encontrado");
+    }
+
+    public void delete(Long id) {
+        for (int i = 0; i < vehicles.size(); i++) {
+            if (vehicles.get(i).getId().equals(id)) {
+                vehicles.remove(i);
+                return;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehículo no encontrado");
+    }
+
+    private boolean existsByPlate(String plate) {
+        for (Vehicle v : vehicles) {
+            if (v.getPlate().equalsIgnoreCase(plate)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
