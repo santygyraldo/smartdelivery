@@ -15,9 +15,17 @@ public class Package {
     @DecimalMin(value = "0.1", message = "El peso debe ser mayor a 0")
     private BigDecimal weight;
 
+    @NotBlank(message = "EL nombre del Destinatario es Obligatorio")
+    @Size(max = 255, message = "La descripción no puede tener más de 255 caracteres")
+    private String recipientName;
+
     @NotBlank(message = "La descripción es obligatoria")
     @Size(max = 255, message = "La descripción no puede tener más de 255 caracteres")
     private String description;
+
+    @NotBlank(message = "La dirección de entrega es obligatoria")
+    @Size(max = 255, message = "La dirección no puede tener más de 255 caracteres")
+    private String deliveryAddress;
 
 
     }

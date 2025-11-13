@@ -8,8 +8,8 @@ import lombok.Setter;
 /**
  * Clase abstracta que representa un vehículo
  */
-@Getter
-@Setter
+@Getter // quiere decir que tiene todos los metodos get
+@Setter // quiere decir que tiene todos los metodos set
 public abstract class Vehicle {
 
     /**
@@ -36,7 +36,7 @@ public abstract class Vehicle {
      */
     public Vehicle(String plate) {
         this.plate = plate;
-    }
+    } // significa que llama al constructor de la clase padre
 
     /**
      * Método abstracto para obtener el tipo de vehículo

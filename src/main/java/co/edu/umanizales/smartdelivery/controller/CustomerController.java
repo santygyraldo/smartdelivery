@@ -40,7 +40,7 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public Customer update(@PathVariable Long id, @Valid @RequestBody Customer customer) {
+    public Customer update(@PathVariable Long id, @Valid @RequestBody Customer customer) { // actualiza un cliente
         return customerService.update(id, customer);
     }
 

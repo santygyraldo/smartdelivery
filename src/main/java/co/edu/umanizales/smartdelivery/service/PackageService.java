@@ -41,6 +41,8 @@ public class PackageService {
             if (p.getId().equals(id)) {
                 if (update.getWeight() != null) p.setWeight(update.getWeight());
                 if (update.getDescription() != null) p.setDescription(update.getDescription());
+                if (update.getRecipientName() != null) p.setRecipientName(update.getRecipientName());
+                if (update.getDeliveryAddress() != null) p.setDeliveryAddress(update.getDeliveryAddress());
                 return p;
             }
         }

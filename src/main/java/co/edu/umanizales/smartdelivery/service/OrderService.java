@@ -66,8 +66,8 @@ public class OrderService {
                     delivererService.findById(update.getDelivererId());
                     o.setDelivererId(update.getDelivererId());
                 }
-                if (update.getDeliveryAddress() != null) {
-                    o.setDeliveryAddress(update.getDeliveryAddress());
+                if (update.getStatus() != null) {
+                    o.setStatus(update.getStatus());
                 }
                 return o;
             }

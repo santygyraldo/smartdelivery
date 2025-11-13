@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)  // Incluye solo campos no nulos en el JSON
 public class Order {
+
+    public enum OrderStatus { REGISTERED, DELIVERED }
     
     @CsvBindByName(column = "ID")
     private Long id;
@@ -30,11 +32,9 @@ public class Order {
     @JsonProperty("delivererId")  // Opcional, solo si se asigna un repartidor
     private Long delivererId;
 
-
-    @NotNull(message = "La dirección de entrega es obligatoria")
-    @CsvBindByName(column = "DELIVERY_ADDRESS")
-    private String deliveryAddress;
-
+    @NotNull(message = "El estado es obligatorio")
+    @CsvBindByName(column = "STATUS")
+    @JsonProperty("status")
+    private OrderStatus status = OrderStatus.REGISTERED;
 
     }
-
