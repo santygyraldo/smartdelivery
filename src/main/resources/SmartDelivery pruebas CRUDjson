@@ -460,6 +460,28 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "consultar repartidor asignado a vehiculo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deliverers/{{delivererId}}/vehicle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deliverers",
+								"{{delivererId}}",
+								"vehicle"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -610,6 +632,73 @@
 							"path": [
 								"api",
 								"vehicles",
+								"{{vehicleId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Asignar vehiculo a repartidor",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deliverers/{{delivererId}}/vehicle/{{vehicleId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deliverers",
+								"{{delivererId}}",
+								"vehicle",
+								"{{vehicleId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consultar vehiculo asignado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deliverers/vehicle/{{vehicleId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deliverers",
+								"vehicle",
+								"{{vehicleId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "desaignar vehiculo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/deliverers/vehicle/{{vehicleId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"deliverers",
+								"vehicle",
 								"{{vehicleId}}"
 							]
 						}
