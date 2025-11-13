@@ -48,7 +48,6 @@ public class DelivererService {
                 }
                 if (update.getDocument() != null) d.setDocument(update.getDocument());
                 if (update.getPhone() != null) d.setPhone(update.getPhone());
-                if (update.getVehiclePlate() != null) d.setVehiclePlate(update.getVehiclePlate());
                 return d;
             }
         }

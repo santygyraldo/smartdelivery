@@ -12,9 +12,6 @@ import lombok.EqualsAndHashCode;
 public class Deliverer extends Employee { // extendes hereda de Empleado
 
 
-    @NotBlank(message = "La placa del vehículo es obligatoria")
-    private String vehiclePlate;
-
     @NotBlank(message = "El teléfono es obligatorio")
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;
@@ -25,7 +22,6 @@ public class Deliverer extends Employee { // extendes hereda de Empleado
     // constructor
     public Deliverer(String name, String document, String vehiclePlate, String phone) {
         super(name, document);
-        this.vehiclePlate = vehiclePlate;
-        this.phone = phone;
+         this.phone = phone;
     }
 }
