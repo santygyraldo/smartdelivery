@@ -8,6 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import co.edu.umanizales.smartdelivery.service.CsvService;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,6 +28,54 @@ public class VehicleService {
 
     private final List<Vehicle> vehicles = new ArrayList<>();
     private final AtomicLong idSequence = new AtomicLong(1);
+    private final CsvService csvService;
+
+    public VehicleService(CsvService csvService) {
+        this.csvService = csvService;
+    }
+
+    @PostConstruct
+    private void loadFromCsvAtStartup() {
+        try {
+            Path file = Paths.get("data").resolve("vehicles.csv");
+            if (!Files.exists(file)) {
+                return;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8))) {
+                CsvToBean<CsvService.VehicleCsv> csvToBean = new CsvToBeanBuilder<CsvService.VehicleCsv>(reader)
+                        .withType(CsvService.VehicleCsv.class)
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withIgnoreEmptyLine(true)
+                        .build();
+                List<CsvService.VehicleCsv> flat = csvToBean.parse();
+                List<Vehicle> loaded = new ArrayList<>();
+                long maxId = 0L;
+                for (CsvService.VehicleCsv fv : flat) {
+                    if (fv == null) continue;
+                    String type = fv.getType();
+                    Vehicle v;
+                    if (type != null && type.equalsIgnoreCase("motorcycle")) {
+                        v = new Motorcycle(fv.getPlate());
+                    } else if (type != null && type.equalsIgnoreCase("van")) {
+                        v = new Van(fv.getPlate());
+                    } else if (type != null && type.equalsIgnoreCase("truck")) {
+                        v = new Truck(fv.getPlate());
+                    } else {
+                        continue;
+                    }
+                    v.setId(fv.getId());
+                    loaded.add(v);
+                    if (fv.getId() != null && fv.getId() > maxId) {
+                        maxId = fv.getId();
+                    }
+                }
+                vehicles.clear();
+                vehicles.addAll(loaded);
+                idSequence.set(maxId + 1);
+            }
+        } catch (Exception ignored) {
+        }
+    }
 
     public Vehicle create(String type, String plate) {
         if (existsByPlate(plate)) {
@@ -34,6 +93,7 @@ public class VehicleService {
         }
         v.setId(idSequence.getAndIncrement());
         vehicles.add(v);
+        csvService.exportVehicles(vehicles);
         return v;
     }
 
@@ -66,6 +126,7 @@ public class VehicleService {
         for (Vehicle v : vehicles) {
             if (v.getId().equals(id)) {
                 if (newPlate != null) v.setPlate(newPlate);
+                csvService.exportVehicles(vehicles);
                 return v;
             }
         }
@@ -76,6 +137,7 @@ public class VehicleService {
         for (int i = 0; i < vehicles.size(); i++) {
             if (vehicles.get(i).getId().equals(id)) {
                 vehicles.remove(i);
+                csvService.exportVehicles(vehicles);
                 return;
             }
         }

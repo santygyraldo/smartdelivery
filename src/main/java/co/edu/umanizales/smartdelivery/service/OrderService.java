@@ -5,6 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import co.edu.umanizales.smartdelivery.service.CsvService;
+
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -18,11 +30,40 @@ public class OrderService {
     private final CustomerService customerService;
     private final PackageService packageService;
     private final DelivererService delivererService;
+    private final CsvService csvService;
 
-    public OrderService(CustomerService customerService, PackageService packageService, DelivererService delivererService) {
+    public OrderService(CustomerService customerService, PackageService packageService, DelivererService delivererService, CsvService csvService) {
         this.customerService = customerService;
         this.packageService = packageService;
         this.delivererService = delivererService;
+        this.csvService = csvService;
+    }
+
+    @PostConstruct
+    private void loadFromCsvAtStartup() {
+        try {
+            Path file = Paths.get("data").resolve("orders.csv");
+            if (!Files.exists(file)) {
+                return;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8))) {
+                CsvToBean<Order> csvToBean = new CsvToBeanBuilder<Order>(reader)
+                        .withType(Order.class)
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withIgnoreEmptyLine(true)
+                        .build();
+                List<Order> loaded = csvToBean.parse();
+                orders.clear();
+                orders.addAll(loaded);
+                long maxId = loaded.stream()
+                        .filter(o -> o.getId() != null)
+                        .mapToLong(Order::getId)
+                        .max()
+                        .orElse(0L);
+                idSequence.set(maxId + 1);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public Order create(Order order) {
@@ -35,6 +76,7 @@ public class OrderService {
             order.setId(idSequence.getAndIncrement());
         }
         orders.add(order);
+        csvService.exportOrders(orders);
         return order;
     }
 
@@ -69,6 +111,7 @@ public class OrderService {
                 if (update.getStatus() != null) {
                     o.setStatus(update.getStatus());
                 }
+                csvService.exportOrders(orders);
                 return o;
             }
         }
@@ -79,6 +122,7 @@ public class OrderService {
         for (int i = 0; i < orders.size(); i++) {
             if (orders.get(i).getId().equals(id)) {
                 orders.remove(i);
+                csvService.exportOrders(orders);
                 return;
             }
         }
@@ -89,12 +133,17 @@ public class OrderService {
         Order o = findById(orderId);
         delivererService.findById(delivererId);
         o.setDelivererId(delivererId);
+        csvService.exportOrders(orders);
         return o;
     }
 
     public Order unassignDeliverer(Long orderId) {
         Order o = findById(orderId);
         o.setDelivererId(null);
+        csvService.exportOrders(orders);
         return o;
+    }
+
+    public void loadAll(List<Order> orders) {
     }
 }

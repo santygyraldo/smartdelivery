@@ -1,6 +1,7 @@
 package co.edu.umanizales.smartdelivery.model;
 
 
+import com.opencsv.bean.CsvBindByName;
 import jakarta.validation.constraints.*; // importa las anotaciones de validacion
 import lombok.Data; // importa la anotacion Data de lombok
 import lombok.NoArgsConstructor; //
@@ -16,8 +17,10 @@ public class Deliverer extends Employee { // extendes hereda de Empleado
     @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos")
     private String phone;
 
-
     private boolean available = true; // indica si el repartidor esta disponible
+
+    @CsvBindByName(column = "VEHICLE_ID")
+    private Long vehicleId; // relacion persistida con el vehículo asignado
 
     // constructor
     public Deliverer(String name, String document, String vehiclePlate, String phone) {

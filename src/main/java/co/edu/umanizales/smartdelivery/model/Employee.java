@@ -1,6 +1,7 @@
 package co.edu.umanizales.smartdelivery.model;
 
 
+import com.opencsv.bean.CsvBindByName;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -10,15 +11,15 @@ import lombok.Setter;
 @Setter
 public abstract class Employee {  // Clase abstracta no se puede instanciar directamente
 
-
+    @CsvBindByName(column = "ID")
     private Long id;
 
-
+    @CsvBindByName(column = "NAME")
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String name;
 
-
+    @CsvBindByName(column = "DOCUMENT")
     @NotBlank(message = "El documento es obligatorio")
     @Size(min = 5, max = 20, message = "El documento debe tener entre 5 y 20 caracteres")
     private String document;
@@ -26,7 +27,7 @@ public abstract class Employee {  // Clase abstracta no se puede instanciar dire
     public Employee() {
         // Constructor vacío
     }
-// Constructor con parámetros
+    // Constructor con parámetros
     public Employee(String name, String document) {
         this.name = name;
         this.document = document;

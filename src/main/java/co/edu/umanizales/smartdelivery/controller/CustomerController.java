@@ -16,7 +16,7 @@ public class CustomerController {
 
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
-    }
+    } 
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // Indica que el método crea un nuevo recurso

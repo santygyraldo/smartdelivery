@@ -5,6 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import co.edu.umanizales.smartdelivery.service.CsvService;
+
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import jakarta.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +33,53 @@ public class DelivererService {
     private final Map<Long, Long> vehicleAssignments = new HashMap<>();
 
     private final VehicleService vehicleService;
+    private final CsvService csvService;
 
-    public DelivererService(VehicleService vehicleService) {
+    public DelivererService(VehicleService vehicleService, CsvService csvService) {
         this.vehicleService = vehicleService;
+        this.csvService = csvService;
+    }
+
+    @PostConstruct
+    private void loadFromCsvAtStartup() {
+        try {
+            Path file = Paths.get("data").resolve("deliverers.csv");
+            if (!Files.exists(file)) {
+                return;
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8))) {
+                HeaderColumnNameMappingStrategy<Deliverer> strategy = new HeaderColumnNameMappingStrategy<>();
+                strategy.setType(Deliverer.class);
+                CsvToBean<Deliverer> csvToBean = new CsvToBeanBuilder<Deliverer>(reader)
+                        .withMappingStrategy(strategy)
+                        .withIgnoreLeadingWhiteSpace(true)
+                        .withIgnoreEmptyLine(true)
+                        .build();
+                List<Deliverer> loaded = csvToBean.parse();
+                deliverers.clear();
+                deliverers.addAll(loaded);
+                long maxId = loaded.stream()
+                        .filter(d -> d.getId() != null)
+                        .mapToLong(Deliverer::getId)
+                        .max()
+                        .orElse(0L);
+                idSequence.set(maxId + 1);
+                // Rebuild vehicleAssignments from persisted vehicleId
+                vehicleAssignments.clear();
+                for (Deliverer d : deliverers) {
+                    if (d.getVehicleId() != null) {
+                        try {
+                            vehicleService.findById(d.getVehicleId());
+                            // If duplicated mapping appears, last one wins; or we could skip if already present
+                            vehicleAssignments.put(d.getVehicleId(), d.getId());
+                        } catch (ResponseStatusException ignoredFind) {
+                            // vehicle not found, skip
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     public Deliverer create(Deliverer deliverer) {
@@ -34,6 +90,7 @@ public class DelivererService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El documento ya existe");
         }
         deliverers.add(deliverer);
+        csvService.exportDeliverers(deliverers);
         return deliverer;
     }
 
@@ -59,6 +116,7 @@ public class DelivererService {
                 }
                 if (update.getDocument() != null) d.setDocument(update.getDocument());
                 if (update.getPhone() != null) d.setPhone(update.getPhone());
+                csvService.exportDeliverers(deliverers);
                 return d;
             }
         }
@@ -79,7 +137,11 @@ public class DelivererService {
                 if (vehicleIdToRemove != null) {
                     vehicleAssignments.remove(vehicleIdToRemove);
                 }
+                // Clear persisted relation if present
+                Deliverer d = deliverers.get(i);
+                d.setVehicleId(null);
                 deliverers.remove(i);
+                csvService.exportDeliverers(deliverers);
                 return;
             }
         }
@@ -89,6 +151,7 @@ public class DelivererService {
     public Deliverer setAvailability(Long id, boolean available) {
         Deliverer d = findById(id);
         d.setAvailable(available);
+        csvService.exportDeliverers(deliverers);
         return d;
     }
 
@@ -106,7 +169,7 @@ public class DelivererService {
     public void assignVehicle(Long vehicleId, Long delivererId) {
         // Validar existencia
         vehicleService.findById(vehicleId);
-        findById(delivererId);
+        Deliverer deliverer = findById(delivererId);
 
         // Verificar si el vehículo ya está asignado
         if (vehicleAssignments.containsKey(vehicleId)) {
@@ -126,6 +189,9 @@ public class DelivererService {
         }
 
         vehicleAssignments.put(vehicleId, delivererId);
+        // Persist relation in entity
+        deliverer.setVehicleId(vehicleId);
+        csvService.exportDeliverers(deliverers);
     }
 
     public void unassignByVehicle(Long vehicleId) {
@@ -134,7 +200,17 @@ public class DelivererService {
         if (!vehicleAssignments.containsKey(vehicleId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El vehículo no está asignado");
         }
-        vehicleAssignments.remove(vehicleId);
+        Long delivererId = vehicleAssignments.remove(vehicleId);
+        // Clear persisted relation
+        if (delivererId != null) {
+            try {
+                Deliverer d = findById(delivererId);
+                d.setVehicleId(null);
+            } catch (ResponseStatusException ignored) {
+                // deliverer not found, ignore
+            }
+        }
+        csvService.exportDeliverers(deliverers);
     }
 
     public Deliverer getDelivererByVehicle(Long vehicleId) {

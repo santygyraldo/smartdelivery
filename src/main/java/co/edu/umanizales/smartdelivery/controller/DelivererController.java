@@ -22,7 +22,7 @@ public class DelivererController {
         public Long vehicleId;
     }
 
-    private DelivererResponse toResponse(Deliverer d) {
+    private DelivererResponse toResponse(Deliverer d) { // DelivererResponse es una clase que se encarga de convertir un objeto Deliverer en un objeto JSON
         DelivererResponse r = new DelivererResponse();
         r.id = d.getId();
         r.name = d.getName();
@@ -57,30 +57,30 @@ public class DelivererController {
     }
 
     @GetMapping("/{id}")
-    public DelivererResponse findById(@PathVariable Long id) {
+    public DelivererResponse findById(@PathVariable Long id) { //@pathVariable es un anotacion que indica que el valor de la variable id viene de la URL
         Deliverer d = delivererService.findById(id);
         return toResponse(d);
     }
 
     @PutMapping("/{id}")
-    public DelivererResponse update(@PathVariable Long id, @Valid @RequestBody Deliverer deliverer) {
+    public DelivererResponse update(@PathVariable Long id, @Valid @RequestBody Deliverer deliverer) { //@RequestBody es un anotacion que indica que el valor de la variable deliverer viene del cuerpo de la peticion
         Deliverer upd = delivererService.update(id, deliverer);
         return toResponse(upd);
     }
 
     @DeleteMapping("/{id}") // Elimina un entregador por su ID
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT) //@ResponseStatus es un anotacion que indica que el valor de la variable id viene de la URL
     public void delete(@PathVariable Long id) {
         delivererService.delete(id);
     }
 
     @PutMapping("/{id}/availability") // Actualiza la disponibilidad de un entregador
-    public Deliverer setAvailability(@PathVariable Long id, @RequestParam boolean available) {
+    public Deliverer setAvailability(@PathVariable Long id, @RequestParam boolean available) { //@RequestParam es un anotacion que indica que el valor de la variable available viene de la URL
         return delivererService.setAvailability(id, available);
     }
 
     @GetMapping("/available/one")
-    public DelivererResponse findAvailable() {
+    public DelivererResponse findAvailable() { //findAvailable es un metodo que busca un entregador disponible
         Deliverer d = delivererService.findAvailable();
         return toResponse(d);
     }
