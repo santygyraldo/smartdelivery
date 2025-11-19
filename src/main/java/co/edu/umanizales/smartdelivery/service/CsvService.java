@@ -25,25 +25,25 @@ import java.util.List;
 @Service
 public class CsvService {
 
-    private Path ensureDataDir() {
+    private Path ensureDataDir() { // Se encarga de crear la carpeta data si no existe
         Path dir = Paths.get("data");
-        if (!Files.exists(dir)) {
+        if (!Files.exists(dir)) { // Si no existe
             try {
-                Files.createDirectories(dir);
-            } catch (IOException e) {
+                Files.createDirectories(dir); // Crea la carpeta data
+            } catch (IOException e) { // Si hay un error
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No se pudo crear la carpeta data", e);
             }
         }
         return dir;
     }
 
-    private <T> void writeBeans(List<T> beans, Class<T> type, Path file) {
+    private <T> void writeBeans(List<T> beans, Class<T> type, Path file) { // Se encarga de escribir los datos en el archivo csv
         try {
-            if (!Files.exists(file.getParent())) {
-                Files.createDirectories(file.getParent());
+            if (!Files.exists(file.getParent())) { // Si no existe la carpeta data
+                Files.createDirectories(file.getParent()); // Crea la carpeta data
             }
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file), StandardCharsets.UTF_8));
-            HeaderColumnNameMappingStrategy<T> strategy = new HeaderColumnNameMappingStrategy<>();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file), StandardCharsets.UTF_8)); // Crea el archivo csv
+            HeaderColumnNameMappingStrategy<T> strategy = new HeaderColumnNameMappingStrategy<>(); // <T> significa que es un tipo genérico es decir que puede ser cualquier tipo de dato
             strategy.setType(type);
             StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(writer)
                     .withMappingStrategy(strategy)
@@ -51,12 +51,12 @@ public class CsvService {
             beanToCsv.write(beans);
             writer.flush();
             writer.close();
-        } catch (Exception e) {
+        } catch (Exception e) { 
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error exportando CSV: " + file.getFileName(), e);
         }
     }
 
-    public Path exportCustomers(List<Customer> list) {
+    public Path exportCustomers(List<Customer> list) { // path es la ruta del archivo
         Path file = ensureDataDir().resolve("customers.csv");
         writeBeans(list, Customer.class, file);
         return file;

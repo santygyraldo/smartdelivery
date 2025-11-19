@@ -25,16 +25,16 @@ public class CustomerService {
 
     private final List<Customer> customers = new ArrayList<>(); //Arraylist significa que es una lista dinamica
     private final AtomicLong idSequence = new AtomicLong(1); // atomicLong significa que es un numero que se incrementa automaticamente
-    private final CsvService csvService;
+    private final CsvService csvService; // CsvService es el servicio que se encarga de guardar los datos en el archivo csv
 
-    public CustomerService(CsvService csvService) {
+    public CustomerService(CsvService csvService) { // CsvService es el servicio que se encarga de guardar los datos en el archivo csv
         this.csvService = csvService;
     }
 
-    @PostConstruct
-    private void loadFromCsvAtStartup() {
+    @PostConstruct // Se ejecuta al inicio de la aplicacion
+    private void loadFromCsvAtStartup() { // Carga los datos del archivo csv al inicio de la aplicacion
         try {
-            Path file = Paths.get("data").resolve("customers.csv");
+            Path file = Paths.get("data").resolve("customers.csv"); // ruta del archivo csv
             if (!Files.exists(file)) {
                 return;
             }
@@ -51,15 +51,16 @@ public class CustomerService {
                         .filter(c -> c.getId() != null)
                         .mapToLong(Customer::getId)
                         .max()
-                        .orElse(0L);
+                        .orElse(0L); //0L
                 idSequence.set(maxId + 1);
             }
         } catch (Exception ignored) {
+
         }
     }
 
     public Customer create(Customer customer) { // Crea un cliente
-        if (customer.getId() == null) {
+        if (customer.getId() == null) { // Si el id es null
             customer.setId(idSequence.getAndIncrement()); //idSequence.getAndIncrement() significa que el id se incrementa automaticamente
         }
         if (existsByDocument(customer.getDocument())) {
@@ -72,12 +73,12 @@ public class CustomerService {
 
     public List<Customer> findAll() {
         return customers;
-    }
+    } // Retorna todos los clientes
 
     public Customer findById(Long id) { // Busca un cliente por su ID
         for (Customer c : customers) {
             if (c.getId().equals(id)) {
-                csvService.exportCustomers(customers);
+                csvService.exportCustomers(customers); //
                 return c;
             }
         }
@@ -88,7 +89,7 @@ public class CustomerService {
         for (Customer c : customers) {
             if (c.getId().equals(id)) {
                 if (update.getDocument() != null && !update.getDocument().equals(c.getDocument()) && existsByDocument(update.getDocument())) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El documento ya existe");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El documento ya existe"); //bad
                 }
                 if (update.getDocument() != null) c.setDocument(update.getDocument());
                 if (update.getName() != null) c.setName(update.getName());
@@ -101,19 +102,19 @@ public class CustomerService {
     }
 
     public void delete(Long id) { // Elimina un cliente por su ID
-        for (int i = 0; i < customers.size(); i++) {
-            if (customers.get(i).getId().equals(id)) {
-                customers.remove(i);
+        for (int i = 0; i < customers.size(); i++) { // recorre la lista de clientes
+            if (customers.get(i).getId().equals(id)) { // si el id es igual al id que se le envia
+                customers.remove(i); // elimina el cliente
                 csvService.exportCustomers(customers);
-                return;
+                return; // no retorna nada
             }
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no encontrado"); // lanza una excepcion
     }
 
     public Customer findByDocument(String document) { // Busca un cliente por su documento
-        for (Customer c : customers) {
-            if (c.getDocument().equals(document)) {
+        for (Customer c : customers) { //va recorriendo la lista de clientes
+            if (c.getDocument().equals(document)) { // si encuentra el documento
                 return c;
             }
         }
@@ -128,4 +129,5 @@ public class CustomerService {
         }
         return false;
     }
+
 }

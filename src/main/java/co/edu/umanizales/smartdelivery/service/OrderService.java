@@ -1,6 +1,9 @@
 package co.edu.umanizales.smartdelivery.service;
 
 import co.edu.umanizales.smartdelivery.model.Order;
+import co.edu.umanizales.smartdelivery.model.Customer;
+import co.edu.umanizales.smartdelivery.model.Package;
+import co.edu.umanizales.smartdelivery.model.Deliverer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,11 +70,27 @@ public class OrderService {
     }
 
     public Order create(Order order) {
-        customerService.findById(order.getCustomerId());
-        packageService.findById(order.getPackageId());
-        if (order.getDelivererId() != null) {
-            delivererService.findById(order.getDelivererId());
+        if (order.getCustomer() == null || order.getCustomer().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente es obligatorio");
         }
+        if (order.getOrderPackage() == null || order.getOrderPackage().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El paquete es obligatorio");
+        }
+
+        Customer customer = customerService.findById(order.getCustomer().getId());
+        Package pkg = packageService.findById(order.getOrderPackage().getId());
+        Deliverer deliverer = null;
+        if (order.getDeliverer() != null) {
+            if (order.getDeliverer().getId() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El repartidor debe tener ID");
+            }
+            deliverer = delivererService.findById(order.getDeliverer().getId());
+        }
+
+        order.setCustomer(customer);
+        order.setOrderPackage(pkg);
+        order.setDeliverer(deliverer);
+
         if (order.getId() == null) {
             order.setId(idSequence.getAndIncrement());
         }
@@ -96,17 +115,27 @@ public class OrderService {
     public Order update(Long id, Order update) {
         for (Order o : orders) {
             if (o.getId().equals(id)) {
-                if (update.getCustomerId() != null) {
-                    customerService.findById(update.getCustomerId());
-                    o.setCustomerId(update.getCustomerId());
+                if (update.getCustomer() != null) {
+                    if (update.getCustomer().getId() == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cliente debe tener ID");
+                    }
+                    Customer customer = customerService.findById(update.getCustomer().getId());
+                    o.setCustomer(customer);
                 }
-                if (update.getPackageId() != null) {
-                    packageService.findById(update.getPackageId());
-                    o.setPackageId(update.getPackageId());
+                if (update.getOrderPackage() != null) {
+                    if (update.getOrderPackage().getId() == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El paquete debe tener ID");
+                    }
+                    Package pkg = packageService.findById(update.getOrderPackage().getId());
+                    o.setOrderPackage(pkg);
                 }
-                if (update.getDelivererId() != null) {
-                    delivererService.findById(update.getDelivererId());
-                    o.setDelivererId(update.getDelivererId());
+                if (update.getDeliverer() != null) {
+                    if (update.getDeliverer().getId() == null) {
+                        o.setDeliverer(null);
+                    } else {
+                        Deliverer deliverer = delivererService.findById(update.getDeliverer().getId());
+                        o.setDeliverer(deliverer);
+                    }
                 }
                 if (update.getStatus() != null) {
                     o.setStatus(update.getStatus());
@@ -131,15 +160,15 @@ public class OrderService {
 
     public Order assignDeliverer(Long orderId, Long delivererId) {
         Order o = findById(orderId);
-        delivererService.findById(delivererId);
-        o.setDelivererId(delivererId);
+        Deliverer deliverer = delivererService.findById(delivererId);
+        o.setDeliverer(deliverer);
         csvService.exportOrders(orders);
         return o;
     }
 
     public Order unassignDeliverer(Long orderId) {
         Order o = findById(orderId);
-        o.setDelivererId(null);
+        o.setDeliverer(null);
         csvService.exportOrders(orders);
         return o;
     }

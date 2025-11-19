@@ -1,6 +1,7 @@
 package co.edu.umanizales.smartdelivery.service;
 
 import co.edu.umanizales.smartdelivery.model.Deliverer;
+import co.edu.umanizales.smartdelivery.model.Vehicle;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,11 +68,12 @@ public class DelivererService {
                 // Rebuild vehicleAssignments from persisted vehicleId
                 vehicleAssignments.clear();
                 for (Deliverer d : deliverers) {
-                    if (d.getVehicleId() != null) {
+                    if (d.getVehicle() != null && d.getVehicle().getId() != null) {
+                        Long vId = d.getVehicle().getId();
                         try {
-                            vehicleService.findById(d.getVehicleId());
+                            vehicleService.findById(vId);
                             // If duplicated mapping appears, last one wins; or we could skip if already present
-                            vehicleAssignments.put(d.getVehicleId(), d.getId());
+                            vehicleAssignments.put(vId, d.getId());
                         } catch (ResponseStatusException ignoredFind) {
                             // vehicle not found, skip
                         }
@@ -139,7 +141,7 @@ public class DelivererService {
                 }
                 // Clear persisted relation if present
                 Deliverer d = deliverers.get(i);
-                d.setVehicleId(null);
+                d.setVehicle(null);
                 deliverers.remove(i);
                 csvService.exportDeliverers(deliverers);
                 return;
@@ -168,7 +170,7 @@ public class DelivererService {
 
     public void assignVehicle(Long vehicleId, Long delivererId) {
         // Validar existencia
-        vehicleService.findById(vehicleId);
+        Vehicle vehicle = vehicleService.findById(vehicleId);
         Deliverer deliverer = findById(delivererId);
 
         // Verificar si el vehículo ya está asignado
@@ -190,7 +192,7 @@ public class DelivererService {
 
         vehicleAssignments.put(vehicleId, delivererId);
         // Persist relation in entity
-        deliverer.setVehicleId(vehicleId);
+        deliverer.setVehicle(vehicle);
         csvService.exportDeliverers(deliverers);
     }
 
@@ -205,7 +207,7 @@ public class DelivererService {
         if (delivererId != null) {
             try {
                 Deliverer d = findById(delivererId);
-                d.setVehicleId(null);
+                d.setVehicle(null);
             } catch (ResponseStatusException ignored) {
                 // deliverer not found, ignore
             }

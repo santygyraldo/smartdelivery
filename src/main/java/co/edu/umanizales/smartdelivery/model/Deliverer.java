@@ -20,7 +20,7 @@ public class Deliverer extends Employee { // extendes hereda de Empleado
     private boolean available = true; // indica si el repartidor esta disponible
 
     @CsvBindByName(column = "VEHICLE_ID")
-    private Long vehicleId; // relacion persistida con el vehículo asignado
+    private Vehicle vehicle; // relacion persistida con el vehículo asignado
 
     // constructor
     public Deliverer(String name, String document, String vehiclePlate, String phone) {

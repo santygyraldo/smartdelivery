@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController // las respuestas de los metodos seran en formato json
 @RequestMapping("/orders")
 public class OrderController {
 

@@ -49,7 +49,7 @@ public class CsvController {
     @GetMapping("/customers")
     public Map<String, String> exportCustomers() {
         List<Customer> list = customerService.findAll();
-        Path path = csvService.exportCustomers(list);
+        Path path = csvService.exportCustomers(list); // path es la ruta del archivo
         Map<String, String> res = new HashMap<>();
         res.put("file", path.toString());
         return res;

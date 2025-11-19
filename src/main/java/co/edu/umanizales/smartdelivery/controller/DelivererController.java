@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@RestController // las respuestas de los metodos seran en formato json
 @RequestMapping("/deliverers")
 public class DelivererController {
 

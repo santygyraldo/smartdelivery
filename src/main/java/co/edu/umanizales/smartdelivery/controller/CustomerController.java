@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController // las respuestas de los metodos seran en formato json
 @RequestMapping("/customers")
 public class CustomerController {
 
@@ -19,8 +19,8 @@ public class CustomerController {
     } 
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // Indica que el método crea un nuevo recurso
-    public Customer create(@Valid @RequestBody Customer customer) {
+    @ResponseStatus(HttpStatus.CREATED) // @responseStatus indica que el metodo retorna un codigo de estado
+    public Customer create(@Valid @RequestBody Customer customer) { // valid significa que se validara que el objeto tenga todos los campos
         return customerService.create(customer);
     } // Crea un nuevo cliente
 
@@ -45,8 +45,9 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Indica que el metodo no retorna nada
     public void delete(@PathVariable Long id) {
         customerService.delete(id);
     }
 }
+

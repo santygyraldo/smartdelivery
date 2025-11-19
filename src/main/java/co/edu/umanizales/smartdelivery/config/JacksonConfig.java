@@ -16,11 +16,11 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         return Jackson2ObjectMapperBuilder.json()
                 .featuresToDisable(
-                    SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-                    SerializationFeature.FAIL_ON_EMPTY_BEANS,
+                    SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, // significa que no se escribiran los datos en formato timestamp
+                    SerializationFeature.FAIL_ON_EMPTY_BEANS, //
                     DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
                 )
-                .modules(new JavaTimeModule())
+                .modules(new JavaTimeModule()) //
                 .serializationInclusion(JsonInclude.Include.NON_NULL)
                 .build()
                 .findAndRegisterModules();

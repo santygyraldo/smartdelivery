@@ -19,18 +19,15 @@ public class Order {
     private Long id;
 
     @NotNull(message = "El cliente es obligatorio")
-    @CsvBindByName(column = "CUSTOMER_ID")
-    @JsonProperty("customerId")  // Nombre del campo en el JSON
-    private Long customerId;
+    @JsonProperty("customer")  // Nombre del campo en el JSON
+    private Customer customer;
 
     @NotNull(message = "El paquete es obligatorio")
-    @CsvBindByName(column = "PACKAGE_ID")
-    @JsonProperty("packageId")  // Nombre del campo en el JSON
-    private Long packageId;
+    @JsonProperty("package")  // Nombre del campo en el JSON
+    private Package orderPackage;
 
-    @CsvBindByName(column = "DELIVERER_ID")
-    @JsonProperty("delivererId")  // Opcional, solo si se asigna un repartidor
-    private Long delivererId;
+    @JsonProperty("deliverer")  // Opcional, solo si se asigna un repartidor
+    private Deliverer deliverer;
 
     @NotNull(message = "El estado es obligatorio")
     @CsvBindByName(column = "STATUS")
