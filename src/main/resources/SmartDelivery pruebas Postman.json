@@ -77,14 +77,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/customers/{{customerId}}",
+							"raw": "{{baseUrl}}/api/customers/1",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"customers",
-								"{{customerId}}"
+								"1"
 							]
 						}
 					},
@@ -122,17 +122,17 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n       \"document\": \"1053868868\",\n        \"name\": \"Santiago Giraldo\",\n        \"phone\": \"3001234567\"\n}"
+							"raw": "{\n     \"document\": \"123456789\",\n        \"name\": \"cambio prueba 4\",\n        \"phone\": \"3001234588\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/customers/2",
+							"raw": "{{baseUrl}}/api/customers/3",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"customers",
-								"2"
+								"3"
 							]
 						}
 					},
@@ -152,136 +152,6 @@
 								"api",
 								"customers",
 								"1"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Packages",
-			"item": [
-				{
-					"name": "Create Package",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status 201/200', function () { pm.expect([200,201]).to.include(pm.response.code); });",
-									"var json = pm.response.json(); pm.collectionVariables.set('packageId', json.id);"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"weight\": 1.5,\n  \"description\": \"Caja mediana\",\n  \"recipientName\": \"Carlos Pérez\", // Nombre Destinatario\n\"deliveryAddress\": \"Cra 1 # 2-3\"  // Direccion de entrega\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/packages",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"packages"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "List Packages",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/packages",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"packages"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Package by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/packages/2",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"packages",
-								"2"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Package",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"weight\": 1.5,\n  \"description\": \"Caja mediana\",\n  \"recipientName\": \"Ana Gómez\",\n   \"deliveryAddress\": \"Cra 1 # 2-4\"  // Direccion de entrega\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/packages/1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"packages",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Package",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/packages/2",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"packages",
-								"2"
 							]
 						}
 					},
@@ -317,7 +187,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Alice Rider\",\n  \"document\": \"9876543210\",\n   \"phone\": \"3010000000\"\n}"
+							"raw": "{\n  \"name\": \"Repartidor 4\",\n  \"document\": \"12345679\",\n  \"phone\": \"3001234567\",\n  \"available\": true\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/deliverers",
@@ -486,6 +356,136 @@
 			]
 		},
 		{
+			"name": "Packages",
+			"item": [
+				{
+					"name": "Create Package",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status 201/200', function () { pm.expect([200,201]).to.include(pm.response.code); });",
+									"var json = pm.response.json(); pm.collectionVariables.set('packageId', json.id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weight\": 1.5,\n  \"description\": \"Caja mediana\",\n  \"recipientName\": \"Carlos Pérez\", // Nombre Destinatario\n\"deliveryAddress\": \"Cra 1 # 2-3\"  // Direccion de entrega\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/packages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"packages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Packages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/packages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"packages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Package by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/packages/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"packages",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Package",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weight\": 1.5,\n  \"description\": \"Paquete cambiar nombre\",\n  \"recipientName\": \"Ana Gómez\",\n   \"deliveryAddress\": \"Cra 1 # 2-4\"  // Direccion de entrega\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/packages/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"packages",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Package",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/packages/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"packages",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Vehicles",
 			"item": [
 				{
@@ -513,7 +513,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"plate\": \"htl76a\"\n}\n// aqui hay que cambiarle la clase de vehiculo a crear"
+							"raw": "{\n  \"plate\": \"htl76a\"\n}\n// aqui hay que cambiarle la clase de vehiculo a crear\n// seleccionar clase de vehiculo van - truck - motorcycle"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/vehicles?type=motorcycle",
@@ -735,7 +735,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"customerId\": {{customerId}}, // Id del cliente\n  \"packageId\": {{packageId}}  // ID del paquete\n }"
+							"raw": "{\n  \"customer\": { \"id\": 1 },\n  \"package\": { \"id\": 1 },\n  \"status\": \"REGISTERED\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/orders",
@@ -799,17 +799,19 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"delivererId\": 2\n}\n\n// aqui se le asigna y actualiza repartidor al paquete"
+							"raw": "{\n  \"delivererId\": 1\n}\n\n// aqui se le asigna y actualiza repartidor al paquete"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/orders/{{orderId}}",
+							"raw": "{{baseUrl}}/api/orders/{{orderId}}/assign/{{delivererId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"orders",
-								"{{orderId}}"
+								"{{orderId}}",
+								"assign",
+								"{{delivererId}}"
 							]
 						}
 					},
@@ -840,6 +842,34 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cambiar estado de orden",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"status\": \"REGISTERED\" // DELIVERED O REGISTERED\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{baseUrl}}/api/orders/{{orderId}}",
 							"host": [

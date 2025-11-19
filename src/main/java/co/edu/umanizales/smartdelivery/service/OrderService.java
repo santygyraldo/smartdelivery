@@ -4,6 +4,7 @@ import co.edu.umanizales.smartdelivery.model.Order;
 import co.edu.umanizales.smartdelivery.model.Customer;
 import co.edu.umanizales.smartdelivery.model.Package;
 import co.edu.umanizales.smartdelivery.model.Deliverer;
+import co.edu.umanizales.smartdelivery.dto.OrderCsvDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -50,15 +51,31 @@ public class OrderService {
                 return;
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8))) {
-                CsvToBean<Order> csvToBean = new CsvToBeanBuilder<Order>(reader)
-                        .withType(Order.class)
+                CsvToBean<OrderCsvDTO> csvToBean = new CsvToBeanBuilder<OrderCsvDTO>(reader)
+                        .withType(OrderCsvDTO.class)
                         .withIgnoreLeadingWhiteSpace(true)
                         .withIgnoreEmptyLine(true)
                         .build();
-                List<Order> loaded = csvToBean.parse();
+                List<OrderCsvDTO> flat = csvToBean.parse();
                 orders.clear();
-                orders.addAll(loaded);
-                long maxId = loaded.stream()
+                for (OrderCsvDTO dto : flat) {
+                    Order o = new Order();
+                    o.setId(dto.getId());
+                    if (dto.getCustomerId() != null) {
+                        try { o.setCustomer(customerService.findById(dto.getCustomerId())); } catch (ResponseStatusException ignored) {}
+                    }
+                    if (dto.getPackageId() != null) {
+                        try { o.setOrderPackage(packageService.findById(dto.getPackageId())); } catch (ResponseStatusException ignored) {}
+                    }
+                    if (dto.getDelivererId() != null) {
+                        try { o.setDeliverer(delivererService.findById(dto.getDelivererId())); } catch (ResponseStatusException ignored) {}
+                    }
+                    if (dto.getStatus() != null) {
+                        try { o.setStatus(Order.OrderStatus.valueOf(dto.getStatus())); } catch (IllegalArgumentException ignored) {}
+                    }
+                    orders.add(o);
+                }
+                long maxId = orders.stream()
                         .filter(o -> o.getId() != null)
                         .mapToLong(Order::getId)
                         .max()

@@ -2,6 +2,7 @@ package co.edu.umanizales.smartdelivery.service;
 
 import co.edu.umanizales.smartdelivery.model.Deliverer;
 import co.edu.umanizales.smartdelivery.model.Vehicle;
+import co.edu.umanizales.smartdelivery.dto.DelivererCsvDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,17 +50,35 @@ public class DelivererService {
                 return;
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file), StandardCharsets.UTF_8))) {
-                HeaderColumnNameMappingStrategy<Deliverer> strategy = new HeaderColumnNameMappingStrategy<>();
-                strategy.setType(Deliverer.class);
-                CsvToBean<Deliverer> csvToBean = new CsvToBeanBuilder<Deliverer>(reader)
+                HeaderColumnNameMappingStrategy<DelivererCsvDTO> strategy = new HeaderColumnNameMappingStrategy<>();
+                strategy.setType(DelivererCsvDTO.class);
+                CsvToBean<DelivererCsvDTO> csvToBean = new CsvToBeanBuilder<DelivererCsvDTO>(reader)
                         .withMappingStrategy(strategy)
                         .withIgnoreLeadingWhiteSpace(true)
                         .withIgnoreEmptyLine(true)
                         .build();
-                List<Deliverer> loaded = csvToBean.parse();
+                List<DelivererCsvDTO> flat = csvToBean.parse();
                 deliverers.clear();
-                deliverers.addAll(loaded);
-                long maxId = loaded.stream()
+                for (DelivererCsvDTO dto : flat) {
+                    Deliverer d = new Deliverer();
+                    d.setId(dto.getId());
+                    d.setName(dto.getName());
+                    d.setDocument(dto.getDocument());
+                    d.setPhone(dto.getPhone());
+                    if (dto.getAvailable() != null) {
+                        d.setAvailable(dto.getAvailable());
+                    }
+                    if (dto.getVehicleId() != null) {
+                        try {
+                            Vehicle v = vehicleService.findById(dto.getVehicleId());
+                            d.setVehicle(v);
+                        } catch (ResponseStatusException ignoredFind) {
+                            // vehicle not found, skip
+                        }
+                    }
+                    deliverers.add(d);
+                }
+                long maxId = deliverers.stream()
                         .filter(d -> d.getId() != null)
                         .mapToLong(Deliverer::getId)
                         .max()

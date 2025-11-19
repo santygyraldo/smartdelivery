@@ -1,7 +1,6 @@
 package co.edu.umanizales.smartdelivery.model;
 
 
-import com.opencsv.bean.CsvBindByName;
 import jakarta.validation.constraints.*; // importa las anotaciones de validacion
 import lombok.Data; // importa la anotacion Data de lombok
 import lombok.NoArgsConstructor; //
@@ -19,7 +18,6 @@ public class Deliverer extends Employee { // extendes hereda de Empleado
 
     private boolean available = true; // indica si el repartidor esta disponible
 
-    @CsvBindByName(column = "VEHICLE_ID")
     private Vehicle vehicle; // relacion persistida con el vehículo asignado
 
     // constructor

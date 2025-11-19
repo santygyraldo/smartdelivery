@@ -3,8 +3,10 @@ package co.edu.umanizales.smartdelivery.service;
 import co.edu.umanizales.smartdelivery.model.Customer;
 import co.edu.umanizales.smartdelivery.model.Deliverer;
 import co.edu.umanizales.smartdelivery.model.Order;
+import co.edu.umanizales.smartdelivery.dto.OrderCsvDTO;
 import co.edu.umanizales.smartdelivery.model.Package;
 import co.edu.umanizales.smartdelivery.model.Vehicle;
+import co.edu.umanizales.smartdelivery.dto.DelivererCsvDTO;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -70,13 +72,34 @@ public class CsvService {
 
     public Path exportDeliverers(List<Deliverer> list) {
         Path file = ensureDataDir().resolve("deliverers.csv");
-        writeBeans(list, Deliverer.class, file);
+        List<DelivererCsvDTO> flat = new ArrayList<>();
+        for (Deliverer d : list) {
+            DelivererCsvDTO dto = new DelivererCsvDTO();
+            dto.setId(d.getId());
+            dto.setName(d.getName());
+            dto.setDocument(d.getDocument());
+            dto.setPhone(d.getPhone());
+            dto.setAvailable(d.isAvailable());
+            dto.setVehicleId(d.getVehicle() != null ? d.getVehicle().getId() : null);
+            flat.add(dto);
+        }
+        writeBeans(flat, DelivererCsvDTO.class, file);
         return file;
     }
 
     public Path exportOrders(List<Order> list) {
         Path file = ensureDataDir().resolve("orders.csv");
-        writeBeans(list, Order.class, file);
+        List<OrderCsvDTO> flat = new ArrayList<>();
+        for (Order o : list) {
+            OrderCsvDTO dto = new OrderCsvDTO();
+            dto.setId(o.getId());
+            dto.setStatus(o.getStatus() != null ? o.getStatus().name() : null);
+            dto.setCustomerId(o.getCustomer() != null ? o.getCustomer().getId() : null);
+            dto.setPackageId(o.getOrderPackage() != null ? o.getOrderPackage().getId() : null);
+            dto.setDelivererId(o.getDeliverer() != null ? o.getDeliverer().getId() : null);
+            flat.add(dto);
+        }
+        writeBeans(flat, OrderCsvDTO.class, file);
         return file;
     }
 
