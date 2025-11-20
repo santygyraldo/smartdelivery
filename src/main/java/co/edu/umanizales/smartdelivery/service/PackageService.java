@@ -62,6 +62,9 @@ public class PackageService {
     }
 
     public Package create(Package pkg) {
+        if (pkg.getRegistrationDate() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de registro del paquete es obligatoria");
+        }
         if (pkg.getId() == null) {
             pkg.setId(idSequence.getAndIncrement());
         }

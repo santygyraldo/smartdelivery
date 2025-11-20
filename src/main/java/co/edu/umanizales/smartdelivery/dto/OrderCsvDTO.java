@@ -18,6 +18,12 @@ public class OrderCsvDTO {
     @CsvBindByName(column = "STATUS")
     private String status;
 
+    @CsvBindByName(column = "REGISTRATION_DATE")
+    private String registrationDate;
+
+    @CsvBindByName(column = "DELIVERY_DATE")
+    private String deliveryDate;
+
     public OrderCsvDTO() {}
 
     public Long getId() { return id; }
@@ -34,4 +40,10 @@ public class OrderCsvDTO {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getRegistrationDate() { return registrationDate; }
+    public void setRegistrationDate(String registrationDate) { this.registrationDate = registrationDate; }
+
+    public String getDeliveryDate() { return deliveryDate; }
+    public void setDeliveryDate(String deliveryDate) { this.deliveryDate = deliveryDate; }
 }

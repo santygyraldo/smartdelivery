@@ -4,12 +4,11 @@ import co.edu.umanizales.smartdelivery.model.Order;
 import co.edu.umanizales.smartdelivery.model.Customer;
 import co.edu.umanizales.smartdelivery.model.Package;
 import co.edu.umanizales.smartdelivery.model.Deliverer;
+import co.edu.umanizales.smartdelivery.model.Vehicle;
 import co.edu.umanizales.smartdelivery.dto.OrderCsvDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import co.edu.umanizales.smartdelivery.service.CsvService;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -20,9 +19,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -73,6 +76,12 @@ public class OrderService {
                     if (dto.getStatus() != null) {
                         try { o.setStatus(Order.OrderStatus.valueOf(dto.getStatus())); } catch (IllegalArgumentException ignored) {}
                     }
+                    if (dto.getRegistrationDate() != null && !dto.getRegistrationDate().isBlank()) {
+                        try { o.setRegistrationDate(LocalDate.parse(dto.getRegistrationDate())); } catch (Exception ignored) {}
+                    }
+                    if (dto.getDeliveryDate() != null && !dto.getDeliveryDate().isBlank()) {
+                        try { o.setDeliveryDate(LocalDate.parse(dto.getDeliveryDate())); } catch (Exception ignored) {}
+                    }
                     orders.add(o);
                 }
                 long maxId = orders.stream()
@@ -110,6 +119,13 @@ public class OrderService {
 
         if (order.getId() == null) {
             order.setId(idSequence.getAndIncrement());
+        }
+        if (order.getRegistrationDate() == null) {
+            order.setRegistrationDate(LocalDate.now());
+        }
+        if (order.getDeliveryDate() != null && order.getRegistrationDate() != null
+                && order.getDeliveryDate().isBefore(order.getRegistrationDate())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de entrega no puede ser menor a la fecha de registro");
         }
         orders.add(order);
         csvService.exportOrders(orders);
@@ -157,6 +173,18 @@ public class OrderService {
                 if (update.getStatus() != null) {
                     o.setStatus(update.getStatus());
                 }
+                // Validar fechas antes de aplicar definitivamente
+                LocalDate newReg = update.getRegistrationDate() != null ? update.getRegistrationDate() : o.getRegistrationDate();
+                LocalDate newDel = update.getDeliveryDate() != null ? update.getDeliveryDate() : o.getDeliveryDate();
+                if (newReg != null && newDel != null && newDel.isBefore(newReg)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de entrega no puede ser menor a la fecha de registro");
+                }
+                if (update.getRegistrationDate() != null) {
+                    o.setRegistrationDate(update.getRegistrationDate());
+                }
+                if (update.getDeliveryDate() != null) {
+                    o.setDeliveryDate(update.getDeliveryDate());
+                }
                 csvService.exportOrders(orders);
                 return o;
             }
@@ -191,5 +219,77 @@ public class OrderService {
     }
 
     public void loadAll(List<Order> orders) {
+    }
+
+    public static class TypeCountDTO {
+        private String tipo;
+        private long cant;
+        public TypeCountDTO() {}
+        public TypeCountDTO(String tipo, long cant) { this.tipo = tipo; this.cant = cant; }
+        public String getTipo() { return tipo; }
+        public void setTipo(String tipo) { this.tipo = tipo; }
+        public long getCant() { return cant; }
+        public void setCant(long cant) { this.cant = cant; }
+    }
+
+    public static class ReportDayDTO {
+        private String fecha;
+        private long total;
+        private List<TypeCountDTO> tipos_veh;
+        public ReportDayDTO() {}
+        public ReportDayDTO(String fecha, long total, List<TypeCountDTO> tipos_veh) {
+            this.fecha = fecha; this.total = total; this.tipos_veh = tipos_veh;
+        }
+        public String getFecha() { return fecha; }
+        public void setFecha(String fecha) { this.fecha = fecha; }
+        public long getTotal() { return total; }
+        public void setTotal(long total) { this.total = total; }
+        public List<TypeCountDTO> getTipos_veh() { return tipos_veh; }
+        public void setTipos_veh(List<TypeCountDTO> tipos_veh) { this.tipos_veh = tipos_veh; }
+    }
+
+    public List<ReportDayDTO> reportDeliveriesByVehicle(LocalDate startDate, LocalDate endDate, String vehicleType) {
+        if (startDate == null || endDate == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las fechas son obligatorias");
+        }
+        if (endDate.isBefore(startDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha final no puede ser anterior a la inicial");
+        }
+
+        Map<LocalDate, Map<String, Long>> byDateThenType = new LinkedHashMap<>();
+
+        for (Order o : orders) {
+            if (o.getStatus() != Order.OrderStatus.DELIVERED) continue;
+            LocalDate d = o.getDeliveryDate();
+            if (d == null) continue;
+            if (d.isBefore(startDate) || d.isAfter(endDate)) continue;
+            Deliverer del = o.getDeliverer();
+            if (del == null) continue;
+            Vehicle veh = del.getVehicle();
+            if (veh == null) continue;
+            String type = veh.getVehicleType();
+            if (type == null) continue;
+            String normalized = type.toUpperCase();
+            if (vehicleType != null && !vehicleType.isBlank() && !normalized.equalsIgnoreCase(vehicleType)) continue;
+
+            byDateThenType.computeIfAbsent(d, k -> new LinkedHashMap<>());
+            Map<String, Long> typeMap = byDateThenType.get(d);
+            typeMap.put(normalized, typeMap.getOrDefault(normalized, 0L) + 1L);
+        }
+
+        List<ReportDayDTO> result = new ArrayList<>();
+        byDateThenType.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(e -> {
+                    LocalDate date = e.getKey();
+                    Map<String, Long> typeMap = e.getValue();
+                    long total = typeMap.values().stream().mapToLong(Long::longValue).sum();
+                    List<TypeCountDTO> list = new ArrayList<>();
+                    typeMap.entrySet().stream()
+                            .sorted(Map.Entry.comparingByKey())
+                            .forEach(t -> list.add(new TypeCountDTO(t.getKey(), t.getValue())));
+                    result.add(new ReportDayDTO(date.toString(), total, list));
+                });
+        return result;
     }
 }

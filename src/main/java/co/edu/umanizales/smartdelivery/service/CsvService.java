@@ -97,6 +97,8 @@ public class CsvService {
             dto.setCustomerId(o.getCustomer() != null ? o.getCustomer().getId() : null);
             dto.setPackageId(o.getOrderPackage() != null ? o.getOrderPackage().getId() : null);
             dto.setDelivererId(o.getDeliverer() != null ? o.getDeliverer().getId() : null);
+            dto.setRegistrationDate(o.getRegistrationDate() != null ? o.getRegistrationDate().toString() : null);
+            dto.setDeliveryDate(o.getDeliveryDate() != null ? o.getDeliveryDate().toString() : null);
             flat.add(dto);
         }
         writeBeans(flat, OrderCsvDTO.class, file);

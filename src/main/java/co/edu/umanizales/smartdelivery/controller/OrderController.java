@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController // las respuestas de los metodos seran en formato json
@@ -53,5 +54,16 @@ public class OrderController {
     @PutMapping("/{id}/unassign")
     public Order unassignDeliverer(@PathVariable Long id) {
         return orderService.unassignDeliverer(id);
+    }
+
+    @GetMapping("/reports/deliveries-by-vehicle")
+    public List<OrderService.ReportDayDTO> reportDeliveriesByVehicle(
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam(value = "vehicleType", required = false) String vehicleType
+    ) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+        return orderService.reportDeliveriesByVehicle(start, end, vehicleType);
     }
 }

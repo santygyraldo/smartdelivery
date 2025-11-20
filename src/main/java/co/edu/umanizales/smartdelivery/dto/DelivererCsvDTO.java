@@ -2,8 +2,8 @@ package co.edu.umanizales.smartdelivery.dto;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class DelivererCsvDTO {
-    @CsvBindByName(column = "ID")
+public class DelivererCsvDTO { //Clase que se encarga de exportar los datos de los repartidores
+    @CsvBindByName(column = "ID") //
     private Long id;
 
     @CsvBindByName(column = "NAME")

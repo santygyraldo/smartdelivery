@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -34,4 +34,10 @@ public class Order {
     @JsonProperty("status")
     private OrderStatus status = OrderStatus.REGISTERED;
 
-    }
+    @JsonProperty("registrationDate")
+    private LocalDate registrationDate; // Fecha de registro del pedido
+
+    @JsonProperty("deliveryDate")
+    private LocalDate deliveryDate; // Fecha en que se entregó el pedido
+
+}

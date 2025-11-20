@@ -885,6 +885,38 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "reporte entergas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/orders/reports/deliveries-by-vehicle?startDate=1900-01-01&endDate=2100-12-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"orders",
+						"reports",
+						"deliveries-by-vehicle"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "1900-01-01"
+						},
+						{
+							"key": "endDate",
+							"value": "2100-12-31"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
